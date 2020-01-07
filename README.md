@@ -12,7 +12,7 @@ Il nodo responsabile creerà anche l'SBT relativo.
 Esempio di stampa SBT
 I nodi allo stesso livello fanno parte dello stesso livello dell'albero.
 (E' lo stesso albero di figura 4b del paper)
-0100
+0100\n
      --0101
      --0110
            --0111
