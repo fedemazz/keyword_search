@@ -95,6 +95,8 @@ public class Node {
         return this.neighbors;
     }
 
+    //restituiscono i vicini del nodo i cui bitset includono il nodo stesso
+    //tra tutti i vicini prendo solo quelli che soddisfano la condizione isIncluded
     public ArrayList<Node> getNeighborsIncluded(){
         ArrayList<Node> neighborsIncluded = new ArrayList<Node>();
         for (Node neighbor : this.getNeighbors()) {
@@ -145,6 +147,7 @@ public class Node {
     }
 
     //controllo se il primo bitset è contenuto nel secondo
+    //01100 e 01101. il primo è contenuto nel secondo
     public static boolean isIncluded(BitSet bitSet1, BitSet bitSet2){
         BitSet includedBitSet = new BitSet();
         BitSet bs1Temp = new BitSet();
@@ -154,13 +157,15 @@ public class Node {
         bs2Temp.or(bitSet2);
         bs1Temp.and(bs2Temp);
         if ( bs1Temp.equals(includedBitSet)) {
-            //System.out.println(bitSet1);
-            //System.out.println(includedBitSet);
             return true;
         }
         return false;
     }
 
+    //controllo se bitset2 può essere inserito come figlio di bitset 1 nell'SBT
+    //il criterio è che il bit di differena tra bs1 e bs2 sia a destra dell'ultimo bit di bs1
+    //01100 e 01110. bs2 è children
+    //01100 e 11000. bs2 non è children
     public boolean isChildren(BitSet bitSet1, BitSet bitSet2){
         BitSet childrenBitSet = new BitSet();
         BitSet bs1Temp = new BitSet();
@@ -176,6 +181,8 @@ public class Node {
     }
 
 
+    //creo l'sbt relativo ad un set di keyword cercato
+    //il set di keyword cercato è quello su cui è chiamato questo metodo
     public NodeSBT createSBT (boolean init){
 
         NodeSBT root = new NodeSBT(this.getId(), this.getOne());
@@ -201,16 +208,20 @@ public class Node {
         return root;
     }
 
+    //dato il set di keyword a cui appartiene e l'oggetto
     public void addObject(ArrayList<String> key, String value) {
+        //se nell'index è gia presente la keyword, aggiungo l'oggetto alla lista di oggetti per quella keyword
         if (this.objects.containsKey(key)) {
             this.objects.get(key).add(value);
         } else {
+            //altrimenti creo una nuova entry nell'index contente, per ora, solamente l'ogetto aggiunto
             ArrayList<String> object = new ArrayList<String>();
             object.add(value);
             this.objects.put(key, object);
         }
     }
 
+    //dato il set di keyword in input restituisco tutti gli oggetti appartenenti a quel set
     public ArrayList<String> getObjects (ArrayList<String> key){
         if(this.objects.containsKey(key)){
             return this.objects.get(key);

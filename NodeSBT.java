@@ -6,16 +6,15 @@ public class NodeSBT {
     private NodeSBT father = null;
     private String id;
     private BitSet bitset;
-    private boolean finished;
 
     public NodeSBT(String id, BitSet bitset) {
         this.children = new ArrayList<>();
         this.id = id;
         this.bitset = bitset;
-        this.finished = false;
     }
 
     public void addChild(NodeSBT child) {
+        child.setFather(this);
         children.add(child);
     }
 
@@ -34,10 +33,6 @@ public class NodeSBT {
     public String getId(){
         return id;
     }
-
-    public Boolean getFinished(){
-        return finished;
-    }
     
     public void setFather(NodeSBT father){
         this.father = father;
@@ -47,7 +42,4 @@ public class NodeSBT {
         this.id = id;
     }
 
-    public void setFinished(){
-        this.finished = true;
-    }
 }
