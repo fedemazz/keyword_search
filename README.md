@@ -15,7 +15,6 @@ I nodi allo stesso livello fanno parte dello stesso livello dell'albero.
 
 SBT di 0100
 
-0100
 
      --0101
      
