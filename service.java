@@ -75,7 +75,7 @@ public class service {
             System.out.println("Ho trovato il nodo: " + connectedNode.getId());
 
             System.out.println("Spanning binomial tree: ");
-            printTree(connectedNode.createSBT(true), "-");
+            printTree(connectedNode.createSBT(true), "--");
         }
         else {
             System.out.println("Non è stato possibile collegarsi con il nodo");
@@ -128,10 +128,13 @@ public class service {
     }
 
     public static void printTree(NodeSBT root, String bo){ 
+        if (root.getFather() == null){
+            System.out.println(root.getId());
+        }
         for (NodeSBT entry : root.getChildren()){
-            System.out.println(bo + entry.getId());
+            System.out.println("    " + bo + entry.getId());
         if(!entry.getChildren().isEmpty()){
-            printTree(entry, bo + bo + bo);
+            printTree(entry, "      " + bo);
         }
         }
     }
