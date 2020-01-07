@@ -60,10 +60,12 @@ public class service {
         }
         scannerKey.close();
         
+        //visualizzo a schermo le keyword inserite
         System.out.print("Il set di keyword e': {");
         for (String entry : kStringSet){
             System.out.print(entry + ",");
         }
+
         //creo stringa del targetNode per un log
         targetNodeId = getStringSearched(kSet, r);
         System.out.println("}\nNodo che si occupa della keyword: " + targetNodeId);
@@ -74,7 +76,7 @@ public class service {
         if (connectedNode != null){
             System.out.println("Ho trovato il nodo: " + connectedNode.getId());
 
-            System.out.println("Spanning binomial tree: ");
+            System.out.println("Spanning binomial tree di: " + connectedNode.getId());
             printTree(connectedNode.createSBT(true), "--");
         }
         else {
@@ -132,7 +134,7 @@ public class service {
             System.out.println(root.getId());
         }
         for (NodeSBT entry : root.getChildren()){
-            System.out.println("    " + bo + entry.getId());
+            System.out.println("     " + bo + entry.getId());
         if(!entry.getChildren().isEmpty()){
             printTree(entry, "      " + bo);
         }
