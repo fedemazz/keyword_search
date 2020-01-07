@@ -13,8 +13,9 @@ Esempio di stampa SBT
 I nodi allo stesso livello fanno parte dello stesso livello dell'albero.
 (E' lo stesso albero di figura 4b del paper)
 
-0100
+SBT di 0100
 
+0100
      --0101
      
      --0110
