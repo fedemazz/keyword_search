@@ -22,7 +22,7 @@ public class service {
         printLog(hypercube, connectedNode);
 
         //definisco un set di keyword
-        Set<String> K = createKSet();
+        //Set<String> K = createKSet();
 
         String decision;
         boolean yn = true;
@@ -80,6 +80,16 @@ public class service {
         else {
             System.out.println("Non è stato possibile collegarsi con il nodo");
         }
+
+        if(connectedNode.getObjects(kStringSet) != null){
+            ArrayList<String> searchedObjects = new ArrayList<String>(connectedNode.getObjects(kStringSet));
+                for (String entry : searchedObjects){
+                    System.out.println(entry);
+                }
+        } else {
+            System.out.println("La ricerca non ha prodotto risultati");
+        }
+
     }
 
     
@@ -87,17 +97,16 @@ public class service {
         return key.hashCode()%r;
     }
 
+    //non serve, sono i nodi che verificano se hanno le keyword
     //creo set di keyword di test (una keyword per ogni lettera dell'alfabeto)
-    private static Set<String> createKSet(){
+    /*private static Set<String> createKSet(){
         String stringSet ="abcdefghijklmnopqrstuvwxyz";
         Set<String> K = new HashSet<String>();
         for (int i=0; i<stringSet.length(); i++){
         K.add(String.valueOf(stringSet.charAt(i)));   
-            //System.out.println(String.valueOf(stringSet.charAt(i)));
-            //System.out.println(String.valueOf(setK.charAt(i)).hashCode());
         }
         return K;
-    }
+    }*/
 
     private static String getStringSearched(BitSet bs, int r){
         String searched="";

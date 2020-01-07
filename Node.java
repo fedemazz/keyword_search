@@ -10,7 +10,7 @@ public class Node {
     private int n; //numero del nodo 
     private String id; //stringa id del nodo, composta dal suo codice binario
     private BitSet bitset; //bitset del nodo, in particolare tiene traccia dei bit a 1
-    private Map<String, String> objects; //coppia chiave valore, dove il valore in un implementazione reale sarebbe l'indirizzo di una transazione/canale iota
+    private Map<ArrayList<String>,ArrayList<String>> objects; //coppia chiave valore, dove il valore in un implementazione reale sarebbe l'indirizzo di una transazione/canale iota
     private ArrayList<Node> neighbors; //in un implementazione reale sarebbero gli indirizzi?
     private Map<String, String> nodeList; //la lista degli id di tutti gli altri nodi 
 
@@ -22,6 +22,7 @@ public class Node {
         this.n = n; //numero del nodo che verrà trasformato in binario
         this.id = createBinaryID(n); //provare a togliere r
         this.bitset = createBitset(this.id);
+        this.objects = new HashMap<ArrayList<String>, ArrayList<String>>();
         this.neighbors = new ArrayList<Node>();
         this.nodeList = createNodeList();
     }
@@ -198,6 +199,23 @@ public class Node {
             }
         }
         return root;
+    }
+
+    public void addObject(ArrayList<String> key, String value) {
+        if (this.objects.containsKey(key)) {
+            this.objects.get(key).add(value);
+        } else {
+            ArrayList<String> object = new ArrayList<String>();
+            object.add(value);
+            this.objects.put(key, object);
+        }
+    }
+
+    public ArrayList<String> getObjects (ArrayList<String> key){
+        if(this.objects.containsKey(key)){
+            return this.objects.get(key);
+        }
+        return null;
     }
 }
 
