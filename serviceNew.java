@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Scanner;
 
-public class service {
+public class serviceNew {
 
     public static void main(String[]args){
         
@@ -18,29 +18,124 @@ public class service {
         connectedNode = hypercube.getNode(randomNode(r));
 
         printLog(hypercube, connectedNode);
+        String choice;
 
-        //definisco un set di keyword
-        //Set<String> K = createKSet();
+        do{
 
-        String decision;
-        boolean yn = true;
+            System.out.println("\nFai una scelta");
+            System.out.println("****MENU****");
+				System.out.println("1. INSERT");
+				System.out.println("2. SEARCH");
+				System.out.println("3. DELETE");
+				System.out.println("4. EXIT");
+            Scanner scan = new Scanner(System.in);
+            //if(scan.hasNextLine())
+            choice = scan.nextLine();
 
-        //bitset utilizzato per rappresentare il set di keyword
-        //BitSet kSet = new BitSet(r);
+            switch(choice){
+
+
+                case "1": insert(hypercube, connectedNode);
+                break;
+
+                case "2": search(hypercube, connectedNode, r);
+                break;
+
+                case "3": //delete
+                break;
+
+                case "4":	//Exit
+
+					System.out.println("EXIT");
+					break;
+
+				default:
+					break;
+
+            }
+
+        } while(!(choice.equals("4")));
+        
+
+    }
+
+    private static void search(Hypercube hypercube, Node connectedNode, int r) {
+
+        System.out.println("Ricerca");
+
+        //arraylist utilizzato per rappresentare il set di keyword
         ArrayList<String> kStringSet = new ArrayList<String>(); 
+        //variabile per log
         String targetNodeId;
         
+        //chiedo le keyword da inserire all'utente
+        kStringSet = insertKeywords();
+        
+        //visualizzo a schermo le keyword inserite
+        System.out.print("Il set di keyword e': " + kStringSet);
+
+        //visualizzo a schermo il nodo che si occupa della keyword
+        targetNodeId = getStringSearched(connectedNode.generateBitSet(kStringSet), r);
+        System.out.println("\nNodo che si occupa della keyword: " + targetNodeId);
+        System.out.println("Cerco il nodo: " + targetNodeId);
+
+        try {
+            System.out.println(connectedNode.getObjects(hypercube, kStringSet));
+        } catch (NullPointerException e) {
+            System.out.println("Nessun oggetto trovato");
+        }
+        
+        //collego il servizio non più con il nodo casuale ma con il nodo che si occupa del set di chiavi
+        /*connectedNode = connectedNode.findTargetNode(connectedNode.generateBitSet(kStringSet));
+        if (connectedNode != null){
+            System.out.println("Ho trovato il nodo: " + connectedNode.getId());
+            System.out.println("Spanning binomial tree di: " + connectedNode.getId());
+            printTree(connectedNode.createSBT(true), "--");
+        }
+        else {
+            System.out.println("Non è stato possibile collegarsi con il nodo");
+        }*/
+
+
+
+       /* if(connectedNode.getObjects(kStringSet) != null){
+            ArrayList<String> searchedObjects = new ArrayList<String>(connectedNode.getObjects(kStringSet));
+                for (String entry : searchedObjects){
+                    System.out.println(entry);
+                }
+        } else {
+            System.out.println("La ricerca non ha prodotto risultati");
+        }*/
+    }
+
+    private static void insert(Hypercube hypercube, Node connectedNode){
+
+        System.out.println("Inserimento");
+
+        ArrayList<String> key = new ArrayList<String>(insertKeywords());
+
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Inserisci il contenuto dell'oggetto");
+        String valueObject  = scan.nextLine();
+        
+        System.out.println(key);
+        System.out.println(valueObject);
+
+        connectedNode.addObject(hypercube, key, valueObject);
+    }
+
+    private static ArrayList<String> insertKeywords(){
+        String decision;
+        boolean yn = true;
+        ArrayList<String> kStringSet = new ArrayList<String>(); 
         Scanner scannerKey = new Scanner(System.in);
-        System.out.println("Per quale parola chiave vuoi cercare?");
+        System.out.println("Inserisci la parola chiave");
 
         while(yn){
             
             //recupero parola chiave inserita dall'utente
             kStringSet.add(scannerKey.nextLine());
-            //converto la parola chiave in un numero tra 0 e r
-            //int kBit = hashFunction(kStringSet.get(kStringSet.size()-1), r);
-            // setto il k-esimo bit del bitset di ricerca kSet ad 1
-            //kSet.set(kBit); 
+            
 
             System.out.println("Inserire altra keyword?  yes or no");
             decision = scannerKey.nextLine();
@@ -56,49 +151,9 @@ public class service {
                 System.out.println("please enter again ");
             }
         }
-        scannerKey.close();
-        
-        //visualizzo a schermo le keyword inserite
-        System.out.print("Il set di keyword e': " + kStringSet);
-
-        //creo stringa del targetNode per un log
-        targetNodeId = getStringSearched(connectedNode.generateBitSet(kStringSet), r);
-        System.out.println("\nNodo che si occupa della keyword: " + targetNodeId);
-        System.out.println("Cerco il nodo: " + targetNodeId);
-
-        //collego il servizio non più con il nodo casuale ma con il nodo che si occupa del set di chiavi
-        connectedNode = connectedNode.findTargetNode(connectedNode.generateBitSet(kStringSet));
-        if (connectedNode != null){
-            System.out.println("Ho trovato il nodo: " + connectedNode.getId());
-
-            System.out.println("Spanning binomial tree di: " + connectedNode.getId());
-            printTree(connectedNode.createSBT(true), "--");
-        }
-        else {
-            System.out.println("Non è stato possibile collegarsi con il nodo");
-        }
-
-       /* if(connectedNode.getObjects(kStringSet) != null){
-            ArrayList<String> searchedObjects = new ArrayList<String>(connectedNode.getObjects(kStringSet));
-                for (String entry : searchedObjects){
-                    System.out.println(entry);
-                }
-        } else {
-            System.out.println("La ricerca non ha prodotto risultati");
-        }*/
-
+        return kStringSet;
     }
 
-    //non serve, sono i nodi che verificano se hanno le keyword
-    //creo set di keyword di test (una keyword per ogni lettera dell'alfabeto)
-    /*private static Set<String> createKSet(){
-        String stringSet ="abcdefghijklmnopqrstuvwxyz";
-        Set<String> K = new HashSet<String>();
-        for (int i=0; i<stringSet.length(); i++){
-        K.add(String.valueOf(stringSet.charAt(i)));   
-        }
-        return K;
-    }*/
 
     private static String getStringSearched(BitSet bs, int r){
         String searched="";
@@ -138,7 +193,7 @@ public class service {
 
         System.out.println("Connesso al nodo: " + connectedNode.getId() + "\nI suoi neighbors sono:"); 
         for (Node node : connectedNode.getNeighbors()){
-            System.out.println(node.getId());
+            System.out.print("  " + node.getId());
             }
     }
 }

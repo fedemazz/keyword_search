@@ -1,6 +1,10 @@
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,9 +14,10 @@ public class Node {
     private int n; //numero del nodo 
     private String id; //stringa id del nodo, composta dal suo codice binario
     private BitSet bitset; //bitset del nodo, in particolare tiene traccia dei bit a 1
-    private Map<ArrayList<String>,ArrayList<String>> objects; //coppia chiave valore, dove il valore in un implementazione reale sarebbe l'indirizzo di una transazione/canale iota
     private ArrayList<Node> neighbors; //in un implementazione reale sarebbero gli indirizzi?
     private Map<String, String> nodeList; //la lista degli id di tutti gli altri nodi 
+    private Map<ArrayList<String>, ArrayList<String>> references; //coppia chiave valore, dove il valore in un implementazione reale sarebbe l'indirizzo di una transazione/canale iota
+    private Map<String, String> objects;
 
     public Node(){
     }
@@ -22,9 +27,10 @@ public class Node {
         this.n = n; //numero del nodo che verrà trasformato in binario
         this.id = createBinaryID(n); 
         this.bitset = createBitset(this.id);
-        this.objects = new HashMap<ArrayList<String>, ArrayList<String>>();
         this.neighbors = new ArrayList<Node>();
         this.nodeList = createNodeList();
+        this.references = new HashMap<ArrayList<String>, ArrayList<String>>();
+        this.objects = new HashMap<String, String>();
     }
 
     //identifico codice id del nodo
@@ -111,7 +117,17 @@ public class Node {
         return nodeList.keySet();
     }
 
+    public ArrayList<String> getReference(ArrayList<String> key) {
+        if (this.references.containsKey(key)){
+            return this.references.get(key);
+        } else return null;
+    }
 
+    public String getObject(String key) {
+        if (this.objects.containsKey(key)){
+            return this.objects.get(key);
+        } else return null;
+    }
 
     public boolean hasNeighbor(String id){
         for (Node neighbor : this.getNeighbors()) {
@@ -131,14 +147,30 @@ public class Node {
         return false;
     }
 
-    public Node findTargetNode(BitSet targetSet){
+
+    public Node findTargetNode(BitSet bitSet){
         System.out.println("Cerco nodo...");
-        if (this.getOne().equals(targetSet)){
+        if (this.getOne().equals(bitSet)){
             return this;
         }
         else {
-            return this.nearestNode(targetSet).findTargetNode(targetSet);
+            return this.nearestNode(bitSet).findTargetNode(bitSet);
         }
+    }
+
+    public BitSet generateBitSet(ArrayList<String> keySet){
+        BitSet kSet = new BitSet();
+        for (String entry : keySet){
+            int kBit = hashFunction(entry, r);
+            // setto il k-esimo bit del bitset di ricerca kSet ad 1
+            kSet.set(kBit); 
+        }
+        return kSet;
+    }
+
+    
+    private static int hashFunction(String key, int r){
+        return key.hashCode()%r;
     }
 
     public Node nearestNode(BitSet targetSet){
@@ -201,7 +233,7 @@ public class Node {
 
     //creo l'sbt relativo ad un set di keyword cercato
     //il set di keyword cercato è quello su cui è chiamato questo metodo
-    public NodeSBT createSBT (boolean init){
+    public NodeSBT generateSBT (boolean init){
 
         NodeSBT root = new NodeSBT(this.getId(), this.getOne());
         for(Node entry : this.getNeighborsIncluded()) {                      
@@ -212,13 +244,13 @@ public class Node {
                 else {
                     //la prima volta aggiungo tutti i vicini con un bit di differenza all'albero (sono figli di root)
                     if (init) {
-                        root.addChild(entry.createSBT(false));
+                        root.addChild(entry.generateSBT(false));
                     } 
                     else {  
                         //caso ricorsivo per il livello superiore al secondo
                         //forse ci va anche questo controllo  this.getOne().previousSetBit(getR()) == entry.getOne().previousSetBit(getR())  
                         if (isChildren(this.getOne(), entry.getOne())){
-                        root.addChild(entry.createSBT(false));
+                        root.addChild(entry.generateSBT(false));
                         }
                     }
             }
@@ -226,25 +258,100 @@ public class Node {
         return root;
     }
 
-    //dato il set di keyword a cui appartiene e l'oggetto
-    public void addObject(ArrayList<String> key, String value) {
-        //se nell'index è gia presente la keyword, aggiungo l'oggetto alla lista di oggetti per quella keyword
-        if (this.objects.containsKey(key)) {
-            this.objects.get(key).add(value);
+    public static String getMd5(String input) { 
+        try { 
+  
+            // Static getInstance method is called with hashing MD5 
+            MessageDigest md = MessageDigest.getInstance("MD5"); 
+  
+            // digest() method is called to calculate message digest 
+            //  of an input digest() return array of byte 
+            byte[] messageDigest = md.digest(input.getBytes()); 
+  
+            // Convert byte array into signum representation 
+            BigInteger no = new BigInteger(1, messageDigest); 
+  
+            // Convert message digest into hex value 
+            String hashtext = no.toString(16); 
+            while (hashtext.length() < 32) { 
+                hashtext = "0" + hashtext; 
+            } 
+            return hashtext; 
+        }  
+  
+        // For specifying wrong message digest algorithms 
+        catch (NoSuchAlgorithmException e) { 
+            throw new RuntimeException(e); 
+        } 
+    } 
+
+    public void addObject(Hypercube hypercube, ArrayList<String> oKey, String oValue){
+        String idObject = getMd5(oValue);
+        //inserisco l'oggetto nella lista objects del nodo che ha avviato la richiesta di inserimento
+        this.objects.put(idObject, oValue);
+
+        //inserisco l'associazione reference <σ, u> nel nodo L(σ) (in questo caso come detto lo inserisco in una hash table comune che esegue il mapping DHT)
+        Insert(hypercube, idObject, this.getId());
+
+        //eseguire il controllo se la copia esiste
+
+        //inserisco nel nodo che si occupa del set di keyword la coppia <Kσ, σ>
+        Insert(findTargetNode(generateBitSet(oKey)), oKey, idObject);
+    }
+
+    private void Insert(Hypercube hypercube, String idObject, String idNode){
+        hypercube.addMapping(idObject, idNode);
+    }
+
+    //metodo per aggiungere alla lista di reference la coppia <Kσ, σ>
+    //va aggiunta nel nodo che si occupa di Kσ, chiamato responsible
+    private void Insert(Node responsible, ArrayList<String> oKey, String idObject){
+        responsible.addReference(oKey, idObject);
+    }
+
+    private void addReference(ArrayList<String> oKey, String idObject) {
+        //se nelle reference è gia presente la keyword, aggiungo l'oggetto alla lista di oggetti per quella keyword
+        if (this.references.containsKey(oKey)) {
+            this.references.get(oKey).add(idObject);
         } else {
-            //altrimenti creo una nuova entry nell'index contente, per ora, solamente l'ogetto aggiunto
+            //altrimenti creo una nuova entry nell'index contente, per ora, solamente la reference dell'ogetto aggiunto
             ArrayList<String> object = new ArrayList<String>();
-            object.add(value);
-            this.objects.put(key, object);
+            object.add(idObject);
+            this.references.put(oKey, object);
         }
     }
 
-    //dato il set di keyword in input restituisco tutti gli oggetti appartenenti a quel set
+    public ArrayList<String> getObjects(Hypercube hypercube, ArrayList<String> keySet){
+        ArrayList<String> result = new ArrayList<String>();
+        //dato il set di keyword al nodo che lo gestisce, ottengo l'arraylist con tutti gli id degli oggetti che sono rappresentati da quelle keyword
+        //cerco nella hash table references
+        //ottengo gli id
+        ArrayList<String> reference = new ArrayList<String>(this.findTargetNode(generateBitSet(keySet)).getReference(keySet));
+
+        //controllo sul conteggio dei risultati 
+        //se inferiore ai risultati attesi esplorare SBT
+        NodeSBT sbtRoot = generateSBT(true);
+
+        if (reference != null){
+            //per ogni coppia 
+            for (String idObject : reference){
+
+                result.add(this.findTargetNode(createBitset(hypercube.getMapping(idObject))).getObject(idObject));
+            }
+        }
+        return result;
+    }
+
+
+
+
+
+    /*//dato il set di keyword in input restituisco tutti gli oggetti appartenenti a quel set
     public ArrayList<String> getObjects (ArrayList<String> key){
         if(this.objects.containsKey(key)){
             return this.objects.get(key);
         }
         return null;
-    }
+    }*/
 }
 

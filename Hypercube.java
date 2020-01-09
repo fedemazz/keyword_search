@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -6,6 +7,7 @@ public class Hypercube {
     private int r; //le dimensioni dell'ipercubo
     
     private Map <String, Node> nodes = new HashMap<>();
+    private Map<String, String> mapping = new HashMap<>(); //mapping id oggetto e nodo in cui è effetivamente contenuto
 
     public Hypercube(int r) {
         this.r = r;
@@ -20,6 +22,8 @@ public class Hypercube {
        for (Map.Entry<String, Node> entry : nodes.entrySet()) {
            entry.getValue().setNeighbors(nodes);
        }
+
+       this.mapping = new HashMap<String, String>();
     }
 
     public int getR(){
@@ -44,5 +48,13 @@ public class Hypercube {
 
     public Node connectTo(String idNode) {
         return nodes.get(idNode);
+    }
+
+    public void addMapping (String idObject, String idNode){
+        this.mapping.put(idObject, idNode);
+    }
+
+    public String getMapping(String idObject){
+        return this.mapping.get(idObject);
     }
 }
