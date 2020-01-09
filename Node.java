@@ -343,15 +343,5 @@ public class Node {
     }
 
 
-
-
-
-    /*//dato il set di keyword in input restituisco tutti gli oggetti appartenenti a quel set
-    public ArrayList<String> getObjects (ArrayList<String> key){
-        if(this.objects.containsKey(key)){
-            return this.objects.get(key);
-        }
-        return null;
-    }*/
 }
 
