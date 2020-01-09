@@ -20,7 +20,7 @@ public class Node {
     public Node (int n, int r){
         this.r = r;//r è la dimensione dell'ipercubo
         this.n = n; //numero del nodo che verrà trasformato in binario
-        this.id = createBinaryID(n); //provare a togliere r
+        this.id = createBinaryID(n); 
         this.bitset = createBitset(this.id);
         this.objects = new HashMap<ArrayList<String>, ArrayList<String>>();
         this.neighbors = new ArrayList<Node>();
@@ -137,14 +137,32 @@ public class Node {
             return this;
         }
         else {
-            return this.getNeighbors().get(getRand()).findTargetNode(targetSet);
+            return this.nearestNode(targetSet).findTargetNode(targetSet);
         }
     }
 
-    public int getRand(){
-        int x = (int)(Math.random()*(( (this.getNeighbors().size()-1) - 0 ) +1 )) + 0 ;
-        return x;
+    public Node nearestNode(BitSet targetSet){
+        BitSet tSet = new BitSet();
+        tSet.or(targetSet);
+
+        for(Node entry : this.getNeighbors()){
+            if (xor(targetSet, entry.getOne()).cardinality() < xor(targetSet, this.getOne()).cardinality()){
+                return entry;
+            }
+        }
+        return null;
     }
+
+    private BitSet xor(BitSet bsTarget, BitSet bsNeigh){
+        BitSet bs1 = new BitSet();
+        BitSet bsXor = new BitSet();
+        bs1.or(bsTarget);
+        bsXor.or(bsNeigh);
+        bsXor.xor(bs1);
+        return bsXor;
+    }
+
+
 
     //controllo se il primo bitset è contenuto nel secondo
     //01100 e 01101. il primo è contenuto nel secondo
