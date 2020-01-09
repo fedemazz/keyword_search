@@ -22,14 +22,13 @@ public class service {
 
         do{
 
-            System.out.println("\nFai una scelta");
-            System.out.println("****MENU****");
-				System.out.println("1. INSERT");
-				System.out.println("2. SEARCH");
-				System.out.println("3. DELETE");
-				System.out.println("4. EXIT");
+            System.out.println("\n****MENU****");
+			System.out.println("1. INSERT");
+			System.out.println("2. SEARCH");
+			System.out.println("3. DELETE");
+            System.out.println("4. EXIT");
+            System.out.print("Fai una scelta (1, 2, 3, 4): ");
             Scanner scan = new Scanner(System.in);
-            //if(scan.hasNextLine())
             choice = scan.nextLine();
 
             switch(choice){
@@ -61,7 +60,7 @@ public class service {
 
     private static void search(Hypercube hypercube, Node connectedNode, int r) {
 
-        System.out.println("Ricerca");
+        System.out.print("2. SEARCH: ");
 
         //arraylist utilizzato per rappresentare il set di keyword
         ArrayList<String> kStringSet = new ArrayList<String>(); 
@@ -110,17 +109,13 @@ public class service {
 
     private static void insert(Hypercube hypercube, Node connectedNode){
 
-        System.out.println("Inserimento");
+        System.out.print("1. INSERT: ");
 
         ArrayList<String> key = new ArrayList<String>(insertKeywords());
 
         Scanner scan = new Scanner(System.in);
         System.out.println("Inserisci il contenuto dell'oggetto");
         String valueObject  = scan.nextLine();
-        
-        System.out.println(key);
-        System.out.println(valueObject);
-
         connectedNode.addObject(hypercube, key, valueObject);
     }
 

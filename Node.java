@@ -149,7 +149,7 @@ public class Node {
 
 
     public Node findTargetNode(BitSet bitSet){
-        System.out.println("Cerco nodo...");
+        //System.out.println("Cerco nodo...");
         if (this.getOne().equals(bitSet)){
             return this;
         }
@@ -323,19 +323,22 @@ public class Node {
 
     public ArrayList<String> getObjects(Hypercube hypercube, ArrayList<String> keySet){
         ArrayList<String> result = new ArrayList<String>();
-        //dato il set di keyword al nodo che lo gestisce, ottengo l'arraylist con tutti gli id degli oggetti che sono rappresentati da quelle keyword
-        //cerco nella hash table references
-        //ottengo gli id
+        //hash table references <Kσ, σ>
+        //do il set di keyword in input al nodo che lo gestisce (K)
+        //ottengo una lista di id. {σ1....σn}
+        //Ogni id si riferisce ad un oggetto differente. Tutti gli oggetti hanno in comune il set di keyword 
         ArrayList<String> reference = new ArrayList<String>(this.findTargetNode(generateBitSet(keySet)).getReference(keySet));
 
         //controllo sul conteggio dei risultati 
         //se inferiore ai risultati attesi esplorare SBT
         NodeSBT sbtRoot = generateSBT(true);
 
+        //se ho risultati
         if (reference != null){
-            //per ogni coppia 
+            //per ogni oggetto
             for (String idObject : reference){
-
+                //cerco il nodo che mantiene l'oggetto σ (ci arrivo attraverso l'hash table <σ, u>)          
+                //e recupero da lui l'oggetto vero e proprio
                 result.add(this.findTargetNode(createBitset(hypercube.getMapping(idObject))).getObject(idObject));
             }
         }
