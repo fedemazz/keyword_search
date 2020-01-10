@@ -16,7 +16,7 @@ public class Node {
     private BitSet bitset; //bitset del nodo, in particolare tiene traccia dei bit a 1
     private ArrayList<Node> neighbors; //in un implementazione reale sarebbero gli indirizzi?
     private Map<String, String> nodeList; //la lista degli id di tutti gli altri nodi 
-    private Map<ArrayList<String>, ArrayList<String>> references; //coppia chiave valore, dove il valore in un implementazione reale sarebbe l'indirizzo di una transazione/canale iota
+    private Map<Set<String>, ArrayList<String>> references; //coppia chiave valore, dove il valore in un implementazione reale sarebbe l'indirizzo di una transazione/canale iota
     private Map<String, String> objects;
 
     public Node(){
@@ -29,7 +29,7 @@ public class Node {
         this.bitset = createBitset(this.id);
         this.neighbors = new ArrayList<Node>();
         this.nodeList = createNodeList();
-        this.references = new HashMap<ArrayList<String>, ArrayList<String>>();
+        this.references = new HashMap<Set<String>, ArrayList<String>>();
         this.objects = new HashMap<String, String>();
     }
 
@@ -117,7 +117,7 @@ public class Node {
         return nodeList.keySet();
     }
 
-    public ArrayList<String> getReference(ArrayList<String> key) {
+    public ArrayList<String> getReference(Set<String> key) {
         if (this.references.containsKey(key)){
             return this.references.get(key);
         } else return null;
@@ -158,7 +158,7 @@ public class Node {
         }
     }
 
-    public BitSet generateBitSet(ArrayList<String> keySet){
+    public BitSet generateBitSet(Set<String> keySet){
         BitSet kSet = new BitSet();
         for (String entry : keySet){
             int kBit = hashFunction(entry, r);
@@ -285,7 +285,7 @@ public class Node {
         } 
     } 
 
-    public void addObject(Hypercube hypercube, ArrayList<String> oKey, String oValue){
+    public void addObject(Hypercube hypercube, Set<String> oKey, String oValue){
         String idObject = getMd5(oValue);
         //inserisco l'oggetto nella lista objects del nodo che ha avviato la richiesta di inserimento
         this.objects.put(idObject, oValue);
@@ -305,11 +305,11 @@ public class Node {
 
     //metodo per aggiungere alla lista di reference la coppia <Kσ, σ>
     //va aggiunta nel nodo che si occupa di Kσ, chiamato responsible
-    private void Insert(Node responsible, ArrayList<String> oKey, String idObject){
+    private void Insert(Node responsible, Set<String> oKey, String idObject){
         responsible.addReference(oKey, idObject);
     }
 
-    private void addReference(ArrayList<String> oKey, String idObject) {
+    private void addReference(Set<String> oKey, String idObject) {
         //se nelle reference è gia presente la keyword, aggiungo l'oggetto alla lista di oggetti per quella keyword
         if (this.references.containsKey(oKey)) {
             this.references.get(oKey).add(idObject);
@@ -321,7 +321,7 @@ public class Node {
         }
     }
 
-    public ArrayList<String> getObjects(Hypercube hypercube, ArrayList<String> keySet){
+    public ArrayList<String> getObjects(Hypercube hypercube, Set<String> keySet, int c){
         ArrayList<String> result = new ArrayList<String>();
         //hash table references <Kσ, σ>
         //do il set di keyword in input al nodo che lo gestisce (K)

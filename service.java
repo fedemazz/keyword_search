@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 public class service {
 
@@ -62,8 +64,8 @@ public class service {
 
         System.out.print("2. SEARCH: ");
 
-        //arraylist utilizzato per rappresentare il set di keyword
-        ArrayList<String> kStringSet = new ArrayList<String>(); 
+        //set utilizzato per rappresentare il set di keyword
+        Set<String> kStringSet = new HashSet<String>(); 
         //variabile per log
         String targetNodeId;
         
@@ -79,7 +81,7 @@ public class service {
         System.out.println("Cerco il nodo: " + targetNodeId);
 
         try {
-            System.out.println(connectedNode.getObjects(hypercube, kStringSet));
+            System.out.println(connectedNode.getObjects(hypercube, kStringSet, 10));
         } catch (NullPointerException e) {
             System.out.println("Nessun oggetto trovato");
         }
@@ -111,7 +113,7 @@ public class service {
 
         System.out.print("1. INSERT: ");
 
-        ArrayList<String> key = new ArrayList<String>(insertKeywords());
+        Set<String> key = new HashSet<String>(insertKeywords());
 
         Scanner scan = new Scanner(System.in);
         System.out.println("Inserisci il contenuto dell'oggetto");
@@ -119,10 +121,10 @@ public class service {
         connectedNode.addObject(hypercube, key, valueObject);
     }
 
-    private static ArrayList<String> insertKeywords(){
+    private static Set<String> insertKeywords(){
         String decision;
         boolean yn = true;
-        ArrayList<String> kStringSet = new ArrayList<String>(); 
+        Set<String> kStringSet = new HashSet<String>(); 
         Scanner scannerKey = new Scanner(System.in);
         System.out.println("Inserisci la parola chiave");
 
@@ -148,7 +150,6 @@ public class service {
         }
         return kStringSet;
     }
-
 
     private static String getStringSearched(BitSet bs, int r){
         String searched="";
