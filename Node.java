@@ -4,7 +4,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,6 +14,7 @@ public class Node {
     private int n; //numero del nodo 
     private String id; //stringa id del nodo, composta dal suo codice binario
     private BitSet bitset; //bitset del nodo, in particolare tiene traccia dei bit a 1
+    private Hashtable<String, Integer> keywordsMap;
     private ArrayList<Node> neighbors; //in un implementazione reale sarebbero gli indirizzi?
     private Map<String, String> nodeList; //la lista degli id di tutti gli altri nodi 
     private Map<Set<String>, ArrayList<String>> references; //coppia chiave valore, dove il valore in un implementazione reale sarebbe l'indirizzo di una transazione/canale iota
@@ -27,6 +28,7 @@ public class Node {
         this.n = n; //numero del nodo che verrà trasformato in binario
         this.id = createBinaryID(n); 
         this.bitset = createBitset(this.id);
+        this.keywordsMap = createKeywordsMap();
         this.neighbors = new ArrayList<Node>();
         this.nodeList = createNodeList();
         this.references = new HashMap<Set<String>, ArrayList<String>>();
@@ -47,6 +49,15 @@ public class Node {
     //passo l' id del nodo e ottengo un bitset dove tengo traccia dei bit ad 1
     private BitSet createBitset(String id){
         return BitSet.valueOf(new long[] { Long.parseLong(id, 2) });
+    }
+
+    private Hashtable<String, Integer> createKeywordsMap(){
+        String keys = "abcdefghijklmnopqrstuvwxyz";
+        Hashtable<String, Integer> result = new Hashtable<String, Integer>();
+        for (int i=0; i<getR(); i++){
+            result.put(Character.toString(keys.charAt(i)), i);
+        }
+        return result;
     }
 
     private Map<String, String> createNodeList(){
@@ -161,9 +172,14 @@ public class Node {
     public BitSet generateBitSet(Set<String> keySet){
         BitSet kSet = new BitSet();
         for (String entry : keySet){
-            int kBit = hashFunction(entry, r);
+            //inizialmente designavo il bit con un'hash function
+            //int kBit = hashFunction(entry, r);
+            //ora lo deciso attraverso un mapping gia prestabilito
+            if (this.keywordsMap.containsKey(entry)){
+            int kBit = this.keywordsMap.get(entry);
             // setto il k-esimo bit del bitset di ricerca kSet ad 1
-            kSet.set(kBit); 
+                kSet.set(kBit); 
+            }
         }
         return kSet;
     }
@@ -344,7 +360,5 @@ public class Node {
         }
         return result;
     }
-
-
 }
 
