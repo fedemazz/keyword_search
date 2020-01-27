@@ -1,11 +1,15 @@
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 public class Node {
@@ -17,8 +21,8 @@ public class Node {
     private Hashtable<String, Integer> keywordsMap;
     private ArrayList<Node> neighbors; //in un implementazione reale sarebbero gli indirizzi?
     private Map<String, String> nodeList; //la lista degli id di tutti gli altri nodi 
-    private Map<Set<String>, ArrayList<String>> references; //coppia chiave valore, dove il valore in un implementazione reale sarebbe l'indirizzo di una transazione/canale iota
-    private Map<String, String> objects;
+    private Map<Integer, String> references; //gli oggetti che hanno in comune la keyword di cui si occupa un nodo
+    private Map<String, String> objects; //gli oggetti mantenuti dal nodo (quelli che sono stati caricati da esso)
 
     public Node(){
     }
@@ -31,7 +35,7 @@ public class Node {
         this.keywordsMap = createKeywordsMap();
         this.neighbors = new ArrayList<Node>();
         this.nodeList = createNodeList();
-        this.references = new HashMap<Set<String>, ArrayList<String>>();
+        this.references = new Hashtable<Integer, String>();
         this.objects = new HashMap<String, String>();
     }
 
@@ -128,10 +132,8 @@ public class Node {
         return nodeList.keySet();
     }
 
-    public ArrayList<String> getReference(Set<String> key) {
-        if (this.references.containsKey(key)){
-            return this.references.get(key);
-        } else return null;
+    public Collection<String> getReference() {
+        return this.references.values();
     }
 
     public String getObject(String key) {
@@ -181,7 +183,10 @@ public class Node {
                 kSet.set(kBit); 
             }
         }
-        return kSet;
+        if (kSet.nextSetBit(0) == -1){
+            return null;
+        } else {
+            return kSet;}
     }
 
     
@@ -240,7 +245,7 @@ public class Node {
         bs1Temp.or(bitSet1);
         bs2Temp.or(bitSet2);
         bs1Temp.xor(bs2Temp);
-        if(bs1Temp.nextSetBit(0) <= childrenBitSet.nextSetBit(0)){
+        if(bs1Temp.nextSetBit(0) < childrenBitSet.nextSetBit(childrenBitSet.nextSetBit(0)+1)){
             return true;
         }
         return false;
@@ -250,29 +255,70 @@ public class Node {
     //creo l'sbt relativo ad un set di keyword cercato
     //il set di keyword cercato è quello su cui è chiamato questo metodo
     public NodeSBT generateSBT (boolean init){
-
+        
         NodeSBT root = new NodeSBT(this.getId(), this.getOne());
         for(Node entry : this.getNeighborsIncluded()) {                      
             //se il primo bit (posizione 0) è settato a 1 sono arrivato ad una foglia
-            if (entry.getOne().nextSetBit(0) == 0) {
+            //se va nel primo posto vuoto 
+            //if (entry.getOne().nextSetBit(0) == 0) {
+            if(entry.getOne().nextSetBit(this.getOne().nextClearBit(0)) == this.getOne().nextClearBit(0)){
                     root.addChild(new NodeSBT(entry.getId(), entry.getOne()));
             }
                 else {
-                    //la prima volta aggiungo tutti i vicini con un bit di differenza all'albero (sono figli di root)
-                    if (init) {
-                        root.addChild(entry.generateSBT(false));
-                    } 
-                    else {  
+                   if (init){
+                    root.addChild(entry.generateSBT(false));
+                   }
                         //caso ricorsivo per il livello superiore al secondo
                         //forse ci va anche questo controllo  this.getOne().previousSetBit(getR()) == entry.getOne().previousSetBit(getR())  
-                        if (isChildren(this.getOne(), entry.getOne())){
+                      else { 
+                          if (isChildren(this.getOne(),  entry.getOne())){
                         root.addChild(entry.generateSBT(false));
-                        }
-                    }
+                       }          
+                    }         
             }
         }
         return root;
     }
+
+    public NodeSBT generateSBT2 (boolean init){
+        
+        NodeSBT root = new NodeSBT(this.getId(), this.getOne());
+
+        for(Node entry : this.getNeighborsIncluded()) {                      
+            //se il primo bit (posizione 0) è settato a 1 sono arrivato ad una foglia
+            //se va nel primo posto vuoto 
+            //if (entry.getOne().nextSetBit(0) == 0) {
+            if(entry.getOne().nextSetBit(this.getOne().nextClearBit(0)) == this.getOne().nextClearBit(0)){
+                    root.addChild(new NodeSBT(entry.getId(), entry.getOne()));
+            }
+                else {
+                   if (init){
+                    root.addChild(entry.generateSBT(false));
+                   }
+                        //caso ricorsivo per il livello superiore al secondo
+                        //forse ci va anche questo controllo  this.getOne().previousSetBit(getR()) == entry.getOne().previousSetBit(getR())  
+                      else { 
+                        if (isChildren(this.getOne(),  entry.getOne())){
+                        root.addChild(entry.generateSBT(false));
+                       }          
+                    }         
+            }
+        }
+        return root;
+    }
+
+    /*public NodeSBT controlSBT(NodeSBT root){
+
+        if (root.getFather()!=null){
+            for (NodeSBT entry : root.getChildren()){
+                if(!isChildren(root.getFather().getBS(), entry.getBS()))
+                root.deleteChild(entry);
+                if(!entry.getChildren().isEmpty()){
+                    controlSBT(entry);
+                }
+        }
+    }else  return null;
+    }*/
 
     public static String getMd5(String input) { 
         try { 
@@ -327,38 +373,97 @@ public class Node {
 
     private void addReference(Set<String> oKey, String idObject) {
         //se nelle reference è gia presente la keyword, aggiungo l'oggetto alla lista di oggetti per quella keyword
-        if (this.references.containsKey(oKey)) {
+        /*if (this.references.containsKey(oKey)) {
             this.references.get(oKey).add(idObject);
         } else {
             //altrimenti creo una nuova entry nell'index contente, per ora, solamente la reference dell'ogetto aggiunto
             ArrayList<String> object = new ArrayList<String>();
             object.add(idObject);
             this.references.put(oKey, object);
-        }
+        }*/
+        this.references.put(this.references.size(), idObject);
     }
 
-    public ArrayList<String> getObjects(Hypercube hypercube, Set<String> keySet, int c){
+    //22/01/19 
+    // modificato modo con cui ottengo posizione del bit settato ad 1
+    //ora ho solo un set di keyword per ogni nodo, 
+    //non è più necessario richiedere al nodo la lista di solo gli oggetti con quelle keyword ma posso chiedere quegli oggetti
+    //soluzione: potrei fare un metodo intermedio priima di get object dove trasformo il keyset in bitset e chiamo il vecchio metodo
+    //non passando più il keyset ma passando il bitset, in modo tale da poterlo richiamare ricorsivamente 
+
+    /*public ArrayList<String> T_QUERY(Set<String> keySet, int c){
         ArrayList<String> result = new ArrayList<String>();
         //hash table references <Kσ, σ>
         //do il set di keyword in input al nodo che lo gestisce (K)
         //ottengo una lista di id. {σ1....σn}
         //Ogni id si riferisce ad un oggetto differente. Tutti gli oggetti hanno in comune il set di keyword 
-        ArrayList<String> reference = new ArrayList<String>(this.findTargetNode(generateBitSet(keySet)).getReference(keySet));
+        try {
+            ArrayList<String> reference = new ArrayList<String>(this.findTargetNode(generateBitSet(keySet)).getReference());
+            //controllo sul conteggio dei risultati 
 
-        //controllo sul conteggio dei risultati 
-        //se inferiore ai risultati attesi esplorare SBT
-        NodeSBT sbtRoot = generateSBT(true);
-
-        //se ho risultati
-        if (reference != null){
-            //per ogni oggetto
-            for (String idObject : reference){
-                //cerco il nodo che mantiene l'oggetto σ (ci arrivo attraverso l'hash table <σ, u>)          
-                //e recupero da lui l'oggetto vero e proprio
-                result.add(this.findTargetNode(createBitset(hypercube.getMapping(idObject))).getObject(idObject));
+            //se ho risultati
+            if (reference.size() >= c){
+                return result;
+            } else {
+                //se inferiore ai risultati attesi esplorare SBT
+                NodeSBT sbtRoot = generateSBT(true);
+                return result.addAll(T_QUERY(keySet, c));
             }
+        } catch (NullPointerException e) {
+            System.out.println("Nessuna references corrisponde alle keyword di ricerca");
         }
+    }*/
+
+
+    public ArrayList<String> requestObjects(Set<String> keySet, int c){
+        //l'utente chiede al nodo a cui è connesso di trovare il nodo che si occupa del keyset e restituire gli oggetti per quella keyword
+        ArrayList<String> result = new ArrayList<>(this.findTargetNode(generateBitSet(keySet)).T_QUERY(generateBitSet(keySet), c, this.getOne()));
         return result;
     }
+
+    public ArrayList<String> T_QUERY(BitSet keySet, int c, BitSet nodeCollecter){
+        ArrayList<String> result = new ArrayList<>(this.getReference());
+        if (this.getReference().size() >= c) {
+        return result;
+        } else {
+            
+            NodeSBT root = generateSBT(true);
+            Queue<NodeSBT> queue = new LinkedList<>(root.BFS());
+            Queue<NodeSBT> queue2 = new LinkedList<>(root.BFS());
+
+            
+            System.out.println("Cerco anche in altri nodi...");
+
+           while(!queue2.isEmpty()){
+                System.out.println(queue2.remove().getId());
+            }
+
+            while(!queue.isEmpty()){
+                                BitSet newSet = queue.remove().getBS();
+                                result.addAll(this.findTargetNode(newSet).T_QUERY(newSet, c - result.size(), nodeCollecter, queue));
+                                if (result.size() >= c) {
+                                    return result;
+                                }
+            }
+            return result;
+        }
+    }
+
+    public ArrayList<String> T_QUERY(BitSet keySet, int c, BitSet nodeCollecter, Queue<NodeSBT> queue){
+        return new ArrayList<>(this.getReference());
+    }
+
+    //metodo che permette, una volta ottenuti gli id degli oggetti, di recuperare gli oggetti dal nodo in cui sono contenuti
+    public ArrayList<String> getObjects(Hypercube hypercube, ArrayList<String> idObjects){
+        ArrayList<String> result = new ArrayList<String>();
+       //per ogni oggetto
+       for (String id : idObjects){
+        //cerco il nodo che mantiene l'oggetto σ (ci arrivo attraverso l'hash table <σ, u>)          
+        //e recupero da lui l'oggetto vero e proprio
+        result.add(this.findTargetNode(createBitset(hypercube.getMapping(id))).getObject(id));
+    }
+    return result;
+    }
+
 }
 

@@ -68,7 +68,7 @@ public class service {
         Set<String> kStringSet = new HashSet<String>(); 
         //variabile per log
         String targetNodeId;
-        
+        ArrayList<String> idObjects;
         //chiedo le keyword da inserire all'utente
         kStringSet = insertKeywords();
         
@@ -81,7 +81,8 @@ public class service {
         System.out.println("Cerco il nodo: " + targetNodeId);
 
         try {
-            System.out.println(connectedNode.getObjects(hypercube, kStringSet, 10));
+            idObjects = new ArrayList<String>(connectedNode.requestObjects(kStringSet, 10));
+            System.out.println(connectedNode.getObjects(hypercube, idObjects));
         } catch (NullPointerException e) {
             System.out.println("Nessun oggetto trovato");
         }
