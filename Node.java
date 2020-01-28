@@ -1,7 +1,6 @@
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -22,6 +21,8 @@ public class Node {
     private ArrayList<Node> neighbors; //in un implementazione reale sarebbero gli indirizzi?
     private Map<Integer, String> references; //gli oggetti che hanno in comune la keyword di cui si occupa un nodo
     private Map<String, String> objects; //gli oggetti mantenuti dal nodo (quelli che sono stati caricati da esso)
+    private String idTrytes;
+    private byte[] tritset;
 
     public Node(){
     }
@@ -35,6 +36,8 @@ public class Node {
         this.neighbors = new ArrayList<Node>();
         this.references = new Hashtable<Integer, String>();
         this.objects = new HashMap<String, String>();
+        this.idTrytes = Trytes.fromNumber(new BigInteger(Integer.toString(n)), 2);
+        this.tritset = Trytes.toTrits(idTrytes);
     }
 
     //identifico codice id del nodo
@@ -69,10 +72,13 @@ public class Node {
        //e li confronto agli stessi, per trovare i "neighbors" dei vari nodi
        //cioè quelli che differiscono di un bit rispetto al nodo trattato
         for (Map.Entry<String, Node> entry : nodes.entrySet()) {
-            if (differOneBit(this.getN(), entry.getValue().getN())){
+            //if (differOneBit(this.getN(), entry.getValue().getN())){
+            if (Trytes.differOneTrit(this.getTrits(), entry.getValue().getTrits())){
             neighbors.add(entry.getValue());
             }
         }
+
+
        }
 
     //metodo per verificare se due numeri differiscono solo di un bit
@@ -97,8 +103,17 @@ public class Node {
         return this.bitset;
     }
 
+
     public BitSet getZero(String id){
         return null;
+    }
+
+    public byte[] getTrits(){
+        return this.tritset;
+    }
+
+    public String getTrytes(){
+        return this.idTrytes;
     }
 
     //restituisco i vicini del nodo
@@ -130,7 +145,7 @@ public class Node {
 
     public boolean hasNeighbor(String id){
         for (Node neighbor : this.getNeighbors()) {
-            if (neighbor.getId().equals(id)) {
+            if (neighbor.getId().equals(id) || neighbor.getTrytes().equals(id)) {
                 return true;
             }
         }

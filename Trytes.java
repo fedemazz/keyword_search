@@ -231,19 +231,53 @@ public final class Trytes {
         return Trytes.TRYTES.charAt((int) (Math.random() * 27));
     }
 
+    public static boolean differOneTrit(byte[] trits1, byte[] trits2){
+        assert trits1.length == trits2.length;
+        int cont = 0;
+        for (int i = 0; i < trits1.length; i++) {
+            if (trits1[i] == trits2[i]){
+            } else if (Math.abs(trits1[i]) - Math.abs(trits2[i]) == 0){
+                return false;
+            } else if (Math.abs(Math.abs(trits1[i]) - Math.abs(trits2[i])) == 1){
+                cont++;
+            }  
+        }
+
+        if (cont == 1){
+            return true;
+        } else return false;
+    }
+
 
     public static void main(String[]args){
 
-        Trytes tr = new Trytes();
-        BigInteger bi = new BigInteger(Integer.toString(90));
+        
+
+        for (int i = 0; i<100; i++){
+            BigInteger bi = new BigInteger(Integer.toString(i));
 
         //dato in input un biginteger e la lunghezza desiderata in tryte
         //converte la string in tryte
-        System.out.println(tr.fromNumber(bi, 3));
-        System.out.println(Arrays.toString(tr.toTrits(tr.fromNumber(bi, 3))));
+        System.out.println(Trytes.fromNumber(bi, 2));
+        System.out.println(Arrays.toString(Trytes.toTrits(Trytes.fromNumber(bi, 2))));
+        System.out.println("///////////////////////////////////////////////////");
+        }
+
+
+        BigInteger bi2 = new BigInteger(Integer.toString(364));
+
+        //dato in input un biginteger e la lunghezza desiderata in tryte
+        //converte la string in tryte
+        System.out.println(Trytes.fromNumber(bi2, 2));
+        System.out.println(Arrays.toString(Trytes.toTrits("JC")));
+        System.out.println(Arrays.toString(Trytes.toTrits("IC")));
+        System.out.println(fromNumberToTrits(bi2, 2));
         
- System.out.println(Arrays.toString(tr.fromNumberToTrits(bi, 6)));
-        System.out.println(Integer.toBinaryString(10));
+        System.out.println(Trytes.differOneTrit(Trytes.toTrits("ZI"), Trytes.toTrits("A9")));
+        //System.out.println(Arrays.toString(tr.fromNumberToTrits(bi2, 6)));
+        //System.out.println(Integer.toBinaryString(10));
+
+        System.out.println(Math.abs(-1) - Math.abs(0));
 
 
     }
