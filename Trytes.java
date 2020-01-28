@@ -235,12 +235,12 @@ public final class Trytes {
     public static void main(String[]args){
 
         Trytes tr = new Trytes();
-        BigInteger bi = new BigInteger(Integer.toString(163242340));
+        BigInteger bi = new BigInteger(Integer.toString(90));
 
         //dato in input un biginteger e la lunghezza desiderata in tryte
         //converte la string in tryte
-        System.out.println(tr.fromNumber(bi, 10));
-        System.out.println(Arrays.toString(tr.toTrits(tr.fromNumber(bi, 6))));
+        System.out.println(tr.fromNumber(bi, 3));
+        System.out.println(Arrays.toString(tr.toTrits(tr.fromNumber(bi, 3))));
         
  System.out.println(Arrays.toString(tr.fromNumberToTrits(bi, 6)));
         System.out.println(Integer.toBinaryString(10));

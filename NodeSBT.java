@@ -50,7 +50,7 @@ public class NodeSBT {
     }
 
 
-    /*public void printTree(NodeSBT root, String bo){ 
+    public void printTree(NodeSBT root, String bo){ 
         if (root.getFather() == null){
             System.out.println(root.getId());
         }
@@ -60,7 +60,7 @@ public class NodeSBT {
             printTree(entry, "      " + bo);
         }
         }
-    }*/
+    }
 
     public void printTreeBFS(){
         Queue<NodeSBT> queue = new ArrayDeque<NodeSBT>();

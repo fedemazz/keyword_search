@@ -1,6 +1,7 @@
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -217,92 +218,34 @@ public class Node {
         return false;
     }
 
-    //controllo se bitset2 può essere inserito come figlio di bitset 1 nell'SBT
-    //il criterio è che il bit di differena tra bs1 e bs2 sia a destra dell'ultimo bit di bs1
-    //01100 e 01110. bs2 è children
-    //01100 e 11000. bs2 non è children
-    public boolean isChildren(BitSet bitSet1, BitSet bitSet2){
-        BitSet childrenBitSet = new BitSet();
-        BitSet bs1Temp = new BitSet();
-        BitSet bs2Temp = new BitSet();
-        childrenBitSet.or(bitSet1); 
-        bs1Temp.or(bitSet1);
-        bs2Temp.or(bitSet2);
-        bs1Temp.xor(bs2Temp);
-        if(bs1Temp.nextSetBit(0) < childrenBitSet.nextSetBit(childrenBitSet.nextSetBit(0)+1)){
-            return true;
-        }
-        return false;
-    }
-
-
-    //creo l'sbt relativo ad un set di keyword cercato
-    //il set di keyword cercato è quello su cui è chiamato questo metodo
-    public NodeSBT generateSBT (boolean init){
-        
+    //metodo per la creazione dell'albero di ricerca 
+    //prende in input un valore intero che ho chiamato responsabilità 
+    //la responsabilità è la parte del bitset di cui un nodo dell'albero si deve occupare
+    //es. il nodo 001100, avrà come figli solamente nodi con bit accesi dopo il bit alla quarta posizione (cioè il suo ultimo bit acceso)
+    public NodeSBT generateSBT (int resp){
         NodeSBT root = new NodeSBT(this.getId(), this.getOne());
         for(Node entry : this.getNeighborsIncluded()) {                      
-            //se il primo bit (posizione 0) è settato a 1 sono arrivato ad una foglia
-            //se va nel primo posto vuoto 
-            //if (entry.getOne().nextSetBit(0) == 0) {
             if(entry.getOne().nextSetBit(this.getOne().nextClearBit(0)) == this.getOne().nextClearBit(0)){
-                    root.addChild(new NodeSBT(entry.getId(), entry.getOne()));
-            }
-                else {
-                   if (init){
-                    root.addChild(entry.generateSBT(false));
-                   }
-                        //caso ricorsivo per il livello superiore al secondo
-                        //forse ci va anche questo controllo  this.getOne().previousSetBit(getR()) == entry.getOne().previousSetBit(getR())  
-                      else { 
-                          if (isChildren(this.getOne(),  entry.getOne())){
-                        root.addChild(entry.generateSBT(false));
-                       }          
-                    }         
-            }
+                root.addChild(new NodeSBT(entry.getId(), entry.getOne()));
+        }   else {
+                    if (xorChild(this.getOne(),entry.getOne()) <= resp) { 
+                        root.addChild(entry.generateSBT(xorChild(this.getOne(), entry.getOne())));
+                    }
         }
-        return root;
+    }
+    return root;
     }
 
-    public NodeSBT generateSBT2 (boolean init){
-        
-        NodeSBT root = new NodeSBT(this.getId(), this.getOne());
-
-        for(Node entry : this.getNeighborsIncluded()) {                      
-            //se il primo bit (posizione 0) è settato a 1 sono arrivato ad una foglia
-            //se va nel primo posto vuoto 
-            //if (entry.getOne().nextSetBit(0) == 0) {
-            if(entry.getOne().nextSetBit(this.getOne().nextClearBit(0)) == this.getOne().nextClearBit(0)){
-                    root.addChild(new NodeSBT(entry.getId(), entry.getOne()));
-            }
-                else {
-                   if (init){
-                    root.addChild(entry.generateSBT(false));
-                   }
-                        //caso ricorsivo per il livello superiore al secondo
-                        //forse ci va anche questo controllo  this.getOne().previousSetBit(getR()) == entry.getOne().previousSetBit(getR())  
-                      else { 
-                        if (isChildren(this.getOne(),  entry.getOne())){
-                        root.addChild(entry.generateSBT(false));
-                       }          
-                    }         
-            }
-        }
-        return root;
+    private int xorChild(BitSet father, BitSet child) {
+        BitSet fatherTemp = new BitSet();
+        BitSet childTemp = new BitSet();
+        BitSet result = new BitSet();
+        fatherTemp.or(father);
+        childTemp.or(child);
+        result.or(father);
+        result.xor(childTemp);
+        return result.nextSetBit(0);
     }
-
-    /*public NodeSBT controlSBT(NodeSBT root){
-
-        if (root.getFather()!=null){
-            for (NodeSBT entry : root.getChildren()){
-                if(!isChildren(root.getFather().getBS(), entry.getBS()))
-                root.deleteChild(entry);
-                if(!entry.getChildren().isEmpty()){
-                    controlSBT(entry);
-                }
-        }
-    }else  return null;
-    }*/
 
     public static String getMd5(String input) { 
         try { 
@@ -356,26 +299,13 @@ public class Node {
     }
 
     private void addReference(Set<String> oKey, String idObject) {
-        //se nelle reference è gia presente la keyword, aggiungo l'oggetto alla lista di oggetti per quella keyword
-        /*if (this.references.containsKey(oKey)) {
-            this.references.get(oKey).add(idObject);
-        } else {
-            //altrimenti creo una nuova entry nell'index contente, per ora, solamente la reference dell'ogetto aggiunto
-            ArrayList<String> object = new ArrayList<String>();
-            object.add(idObject);
-            this.references.put(oKey, object);
-        }*/
         this.references.put(this.references.size(), idObject);
     }
 
-    //22/01/19 
-    // modificato modo con cui ottengo posizione del bit settato ad 1
-    //ora ho solo un set di keyword per ogni nodo, 
-    //non è più necessario richiedere al nodo la lista di solo gli oggetti con quelle keyword ma posso chiedere quegli oggetti
-       public ArrayList<String> requestObjects(Set<String> keySet, int c){
-        //l'utente chiede al nodo a cui è connesso di trovare il nodo che si occupa del keyset e restituire gli oggetti per quella keyword
-        ArrayList<String> result = new ArrayList<>(this.findTargetNode(generateBitSet(keySet)).T_QUERY(generateBitSet(keySet), c, this.getOne()));
-        return result;
+    public ArrayList<String> requestObjects(Set<String> keySet, int c){
+      //l'utente chiede al nodo a cui è connesso di trovare il nodo che si occupa del keyset e restituire gli oggetti per quella keyword
+      ArrayList<String> result = new ArrayList<>(this.findTargetNode(generateBitSet(keySet)).T_QUERY(generateBitSet(keySet), c, this.getOne()));
+      return result;
     }
 
     public ArrayList<String> T_QUERY(BitSet keySet, int c, BitSet nodeCollecter){
@@ -384,7 +314,8 @@ public class Node {
         return result;
         } else {
             
-            NodeSBT root = generateSBT(true);
+            NodeSBT root = generateSBT(getR() - 1);
+            root.printTree(root, "  ");
             Queue<NodeSBT> queue = new LinkedList<>(root.BFS());
             Queue<NodeSBT> queue2 = new LinkedList<>(root.BFS());
 
