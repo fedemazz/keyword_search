@@ -186,7 +186,6 @@ public class service {
     private static void printLog(Hypercube hypercube, Node connectedNode){
          //stampe debug
          System.out.println("Ipercubo creato");
-         System.out.println("I nodi creati sono: \n" + connectedNode.getNodeList());
 
         System.out.println("Connesso al nodo: " + connectedNode.getId() + "\nI suoi neighbors sono:"); 
         for (Node node : connectedNode.getNeighbors()){

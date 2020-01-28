@@ -1,7 +1,6 @@
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -20,7 +19,6 @@ public class Node {
     private BitSet bitset; //bitset del nodo, in particolare tiene traccia dei bit a 1
     private Hashtable<String, Integer> keywordsMap;
     private ArrayList<Node> neighbors; //in un implementazione reale sarebbero gli indirizzi?
-    private Map<String, String> nodeList; //la lista degli id di tutti gli altri nodi 
     private Map<Integer, String> references; //gli oggetti che hanno in comune la keyword di cui si occupa un nodo
     private Map<String, String> objects; //gli oggetti mantenuti dal nodo (quelli che sono stati caricati da esso)
 
@@ -34,7 +32,6 @@ public class Node {
         this.bitset = createBitset(this.id);
         this.keywordsMap = createKeywordsMap();
         this.neighbors = new ArrayList<Node>();
-        this.nodeList = createNodeList();
         this.references = new Hashtable<Integer, String>();
         this.objects = new HashMap<String, String>();
     }
@@ -64,14 +61,6 @@ public class Node {
         return result;
     }
 
-    private Map<String, String> createNodeList(){
-        Map<String, String> list = new  HashMap<String, String>();
-        for (int i = 0; i <Math.pow(2, getR()); i++){
-            String currentID = createBinaryID(i);
-            list.put(currentID, "indirizzo: " + currentID);
-        }
-        return list;
-    }
 
     //setto i vicini del nodo
     public void setNeighbors(Map <String, Node> nodes) {
@@ -126,10 +115,6 @@ public class Node {
             }
         }
         return neighborsIncluded;
-    }
-
-    public Set<String> getNodeList(){
-        return nodeList.keySet();
     }
 
     public Collection<String> getReference() {
@@ -189,10 +174,9 @@ public class Node {
             return kSet;}
     }
 
-    
-    private static int hashFunction(String key, int r){
+    /*private static int hashFunction(String key, int r){
         return key.hashCode()%r;
-    }
+    }*/
 
     public Node nearestNode(BitSet targetSet){
         BitSet tSet = new BitSet();
@@ -388,34 +372,7 @@ public class Node {
     // modificato modo con cui ottengo posizione del bit settato ad 1
     //ora ho solo un set di keyword per ogni nodo, 
     //non è più necessario richiedere al nodo la lista di solo gli oggetti con quelle keyword ma posso chiedere quegli oggetti
-    //soluzione: potrei fare un metodo intermedio priima di get object dove trasformo il keyset in bitset e chiamo il vecchio metodo
-    //non passando più il keyset ma passando il bitset, in modo tale da poterlo richiamare ricorsivamente 
-
-    /*public ArrayList<String> T_QUERY(Set<String> keySet, int c){
-        ArrayList<String> result = new ArrayList<String>();
-        //hash table references <Kσ, σ>
-        //do il set di keyword in input al nodo che lo gestisce (K)
-        //ottengo una lista di id. {σ1....σn}
-        //Ogni id si riferisce ad un oggetto differente. Tutti gli oggetti hanno in comune il set di keyword 
-        try {
-            ArrayList<String> reference = new ArrayList<String>(this.findTargetNode(generateBitSet(keySet)).getReference());
-            //controllo sul conteggio dei risultati 
-
-            //se ho risultati
-            if (reference.size() >= c){
-                return result;
-            } else {
-                //se inferiore ai risultati attesi esplorare SBT
-                NodeSBT sbtRoot = generateSBT(true);
-                return result.addAll(T_QUERY(keySet, c));
-            }
-        } catch (NullPointerException e) {
-            System.out.println("Nessuna references corrisponde alle keyword di ricerca");
-        }
-    }*/
-
-
-    public ArrayList<String> requestObjects(Set<String> keySet, int c){
+       public ArrayList<String> requestObjects(Set<String> keySet, int c){
         //l'utente chiede al nodo a cui è connesso di trovare il nodo che si occupa del keyset e restituire gli oggetti per quella keyword
         ArrayList<String> result = new ArrayList<>(this.findTargetNode(generateBitSet(keySet)).T_QUERY(generateBitSet(keySet), c, this.getOne()));
         return result;
