@@ -1,7 +1,3 @@
-//serie di file js in cui passo per passo inizio con IOTA
-
-//nel seguente file vado a leggere sulla rete devNet Tangle la transazione precedentemente fatta
-
 const Iota = require('@iota/core');
 const Extract = require('@iota/extract-json');
 const Converter = require('@iota/converter');
