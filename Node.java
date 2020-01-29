@@ -72,7 +72,6 @@ public class Node {
        //e li confronto agli stessi, per trovare i "neighbors" dei vari nodi
        //cioè quelli che differiscono di un bit rispetto al nodo trattato
         for (Map.Entry<String, Node> entry : nodes.entrySet()) {
-            //if (differOneBit(this.getN(), entry.getValue().getN())){
             if (Trytes.differOneTrit(this.getTrits(), entry.getValue().getTrits())){
             neighbors.add(entry.getValue());
             }

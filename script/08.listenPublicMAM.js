@@ -6,7 +6,7 @@ const Mam = require('@iota/mam')
 const { asciiToTrytes, trytesToAscii } = require('@iota/converter')
 
 //root channel mam
-root = 'CPQKYUN9GDIHNJPYVSMDXIKWJBEJQRAUMDJNLWAO9BJAFVLPVVCYMZEOKRYUWCARLYEOHEPKISZPFYJOM'
+root = 'ZDWRMFOUQPGT9FLUNTCUXJ9OVRQCPFXCBTTRYYGDNJPBNKZYUNINPUUNCJZARWFJGC9XEQWYXFYJIUMMJ'
 
 async function initMam() {
   console.log("In ascolto...");
