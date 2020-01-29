@@ -185,7 +185,7 @@ public class service {
                 String data = inputStream.next();
                 String [] values = data.split(",");
                 Set<String> keySet = new HashSet<String>();
-                for(String key : values[0].split("")){
+                for(String key : values[1].split("")){
                     keySet.add(key);
                 }
                 connectedNode.addObject(hypercube, keySet, values[0]);
@@ -213,9 +213,9 @@ public class service {
          //stampe debug
          System.out.println("Ipercubo creato");
 
-        System.out.println("Connesso al nodo: " + Arrays.toString(connectedNode.getTrits()) + "\nI suoi neighbors sono:"); 
+        System.out.println("Connesso al nodo: " + connectedNode.getId() + "\nI suoi neighbors sono:"); 
         for (Node node : connectedNode.getNeighbors()){
-            System.out.print("  " + Arrays.toString(node.getTrits()));
+            System.out.print("  " + node.getId());
             }
     }
 }
