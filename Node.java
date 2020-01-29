@@ -324,7 +324,7 @@ public class Node {
             NodeSBT root = generateSBT(getR() - 1);
             //root.printTree(root, "  ");
             Queue<NodeSBT> queue = new LinkedList<>(root.BFS());
-            Queue<NodeSBT> queue2 = new LinkedList<>(root.BFS());
+            //Queue<NodeSBT> queue2 = new LinkedList<>(root.BFS());
 
 
             System.out.println("Cerco anche in altri nodi...");
