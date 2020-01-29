@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Scanner;
@@ -26,7 +27,7 @@ public class service {
         connectedNode = hypercube.getNode(randomNode(r));
 
         printLog(hypercube, connectedNode);
-        loadCsv(hypercube, connectedNode);
+        //loadCsv(hypercube, connectedNode);
         String choice;
 
         do{
@@ -221,9 +222,9 @@ public class service {
          //stampe debug
          System.out.println("Ipercubo creato");
 
-        System.out.println("Connesso al nodo: " + connectedNode.getTrits() + "\nI suoi neighbors sono:"); 
+        System.out.println("Connesso al nodo: " + Arrays.toString(connectedNode.getTrits()) + "\nI suoi neighbors sono:"); 
         for (Node node : connectedNode.getNeighbors()){
-            System.out.print("  " + node.getTrits());
+            System.out.print("  " + Arrays.toString(node.getTrits()));
             }
     }
 }

@@ -322,6 +322,10 @@ public class Node {
       return result;
     }
 
+    public ArrayList<String> requestObjects(Set<String> keySet){
+        return new ArrayList<>(this.findTargetNode(generateBitSet(keySet)).getReference());
+        }
+
     public ArrayList<String> T_QUERY(BitSet keySet, int c, BitSet nodeCollecter){
         ArrayList<String> result = new ArrayList<>(this.getReference());
         if (this.getReference().size() >= c) {

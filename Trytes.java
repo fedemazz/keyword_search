@@ -1,5 +1,6 @@
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.BitSet;
 
 /**
  * This class is a helper tool which allows to perform basic tryte operations, such as conversion between trytes and
@@ -278,6 +279,13 @@ public final class Trytes {
         //System.out.println(Integer.toBinaryString(10));
 
         System.out.println(Math.abs(-1) - Math.abs(0));
+
+
+        BitSet bs = new BitSet(4);
+        bs.set(0);
+        bs.set(1);
+        System.out.println(bs.toByteArray());
+        System.out.println(Arrays.toString(bs.toByteArray()));
 
 
     }
