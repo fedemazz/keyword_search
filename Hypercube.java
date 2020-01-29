@@ -16,7 +16,6 @@ public class Hypercube {
         //devo creare tanti nodi quanto è grande nNode 
         for (int i = 0; i < nNode; i++){
             Node node = new Node(i,r);
-            System.out.println(i + "    " + node.getTrytes() + "     " + Arrays.toString(node.getTrits()));
             nodes.put (node.getId(), node);
        }
 

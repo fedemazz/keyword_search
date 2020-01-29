@@ -21,8 +21,6 @@ public class Node {
     private ArrayList<Node> neighbors; //in un implementazione reale sarebbero gli indirizzi?
     private Map<Integer, String> references; //gli oggetti che hanno in comune la keyword di cui si occupa un nodo
     private Map<String, String> objects; //gli oggetti mantenuti dal nodo (quelli che sono stati caricati da esso)
-    private String idTrytes;
-    private byte[] tritset;
 
     public Node(){
     }
@@ -36,8 +34,6 @@ public class Node {
         this.neighbors = new ArrayList<Node>();
         this.references = new Hashtable<Integer, String>();
         this.objects = new HashMap<String, String>();
-        this.idTrytes = Trytes.fromNumber(new BigInteger(Integer.toString(n)), 2);
-        this.tritset = Trytes.toTrits(idTrytes);
     }
 
     //identifico codice id del nodo
@@ -72,7 +68,8 @@ public class Node {
        //e li confronto agli stessi, per trovare i "neighbors" dei vari nodi
        //cioè quelli che differiscono di un bit rispetto al nodo trattato
         for (Map.Entry<String, Node> entry : nodes.entrySet()) {
-            if (Trytes.differOneTrit(this.getTrits(), entry.getValue().getTrits())){
+            //if (differOneBit(this.getN(), entry.getValue().getN())){
+            if (differOneBit(this.getN(), entry.getValue().getN())){
             neighbors.add(entry.getValue());
             }
         }
@@ -107,14 +104,6 @@ public class Node {
         return null;
     }
 
-    public byte[] getTrits(){
-        return this.tritset;
-    }
-
-    public String getTrytes(){
-        return this.idTrytes;
-    }
-
     //restituisco i vicini del nodo
     public ArrayList<Node> getNeighbors(){
         return this.neighbors;
@@ -144,7 +133,7 @@ public class Node {
 
     public boolean hasNeighbor(String id){
         for (Node neighbor : this.getNeighbors()) {
-            if (neighbor.getId().equals(id) || neighbor.getTrytes().equals(id)) {
+            if (neighbor.getId().equals(id)) {
                 return true;
             }
         }
@@ -322,6 +311,10 @@ public class Node {
       return result;
     }
 
+    public ArrayList<String> requestObjects(Set<String> keySet){
+    return new ArrayList<>(this.findTargetNode(generateBitSet(keySet)).getReference());
+    }
+
     public ArrayList<String> T_QUERY(BitSet keySet, int c, BitSet nodeCollecter){
         ArrayList<String> result = new ArrayList<>(this.getReference());
         if (this.getReference().size() >= c) {
@@ -329,16 +322,16 @@ public class Node {
         } else {
             
             NodeSBT root = generateSBT(getR() - 1);
-            root.printTree(root, "  ");
+            //root.printTree(root, "  ");
             Queue<NodeSBT> queue = new LinkedList<>(root.BFS());
             Queue<NodeSBT> queue2 = new LinkedList<>(root.BFS());
 
-            
+
             System.out.println("Cerco anche in altri nodi...");
 
-           while(!queue2.isEmpty()){
+           /*while(!queue2.isEmpty()){
                 System.out.println(queue2.remove().getId());
-            }
+            }*/
 
             while(!queue.isEmpty()){
                                 BitSet newSet = queue.remove().getBS();
