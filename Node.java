@@ -311,6 +311,10 @@ public class Node {
       return result;
     }
 
+    public ArrayList<String> requestObjects(Set<String> keySet){
+    return new ArrayList<>(this.findTargetNode(generateBitSet(keySet)).getReference());
+    }
+
     public ArrayList<String> T_QUERY(BitSet keySet, int c, BitSet nodeCollecter){
         ArrayList<String> result = new ArrayList<>(this.getReference());
         if (this.getReference().size() >= c) {
@@ -318,16 +322,16 @@ public class Node {
         } else {
             
             NodeSBT root = generateSBT(getR() - 1);
-            root.printTree(root, "  ");
+            //root.printTree(root, "  ");
             Queue<NodeSBT> queue = new LinkedList<>(root.BFS());
             Queue<NodeSBT> queue2 = new LinkedList<>(root.BFS());
 
-            
+
             System.out.println("Cerco anche in altri nodi...");
 
-           while(!queue2.isEmpty()){
+           /*while(!queue2.isEmpty()){
                 System.out.println(queue2.remove().getId());
-            }
+            }*/
 
             while(!queue.isEmpty()){
                                 BitSet newSet = queue.remove().getBS();
