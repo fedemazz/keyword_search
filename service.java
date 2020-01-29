@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ public class service {
         connectedNode = hypercube.getNode(randomNode(r));
 
         printLog(hypercube, connectedNode);
+        loadCsv(hypercube, connectedNode);
         String choice;
 
         do{
@@ -169,6 +171,27 @@ public class service {
             idString = "0" + idString;
         }
         return idString;
+    }
+
+    private static void loadCsv(Hypercube hypercube, Node connectedNode){
+        String fileName = "script/test.csv";
+        File file = new File(fileName);
+        try{
+            Scanner inputStream = new Scanner(file);
+            while(inputStream.hasNext()){
+                String data = inputStream.next();
+                String [] values = data.split(",");
+                Set<String> keySet = new HashSet<String>();
+                for(String key : values[0].split("")){
+                    keySet.add(key);
+                }
+                connectedNode.addObject(hypercube, keySet, values[0]);
+                System.out.println(values[1]);
+            }
+            inputStream.close();
+        } catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
     }
 
     public static void printTree(NodeSBT root, String bo){ 
