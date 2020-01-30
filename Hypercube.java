@@ -1,5 +1,7 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,7 +56,7 @@ public class Hypercube {
     public void addMapping (String idObject, String idNode){
         this.mapping.put(idObject, idNode);
     }
-
+    
     public String getMapping(String idObject){
         return this.mapping.get(idObject);
     }
