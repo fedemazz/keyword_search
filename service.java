@@ -92,7 +92,7 @@ public class service {
         System.out.println("Cerco il nodo: " + targetNodeId);
 
         try {
-            idObjects = new ArrayList<String>(connectedNode.requestObjects(kStringSet, 10));
+            idObjects = new ArrayList<String>(connectedNode.requestObjects(kStringSet, 100));
             System.out.println(connectedNode.getObjects(hypercube, idObjects));
         } catch (NullPointerException e) {
             System.out.println("Nessun oggetto trovato");
