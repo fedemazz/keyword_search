@@ -49,7 +49,7 @@ public class service {
                 case "1": insert(hypercube, connectedNode);
                 break;
 
-                case "2": //search(hypercube, connectedNode, r);
+                case "2": search(hypercube, connectedNode, r);
                 break;
 
                 case "3": pinSearch(hypercube, connectedNode, r);
@@ -73,7 +73,7 @@ public class service {
 
     }
 
-    /*private static void search(Hypercube hypercube, Node connectedNode, int r) {
+    private static void search(Hypercube hypercube, Node connectedNode, int r) {
 
         System.out.print("2. SUPERSET SEARCH: ");
 
@@ -99,7 +99,7 @@ public class service {
         } catch (NullPointerException e) {
             System.out.println("Nessun oggetto trovato");
         }
-    }*/
+    }
 
     private static void pinSearch(Hypercube hypercube, Node connectedNode, int r){
         //set utilizzato per rappresentare il set di keyword
