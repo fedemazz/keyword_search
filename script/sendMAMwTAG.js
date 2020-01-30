@@ -112,4 +112,4 @@ return tag;
 }
 
 //console.log(getRandomTag());
-init(4);
+init(10);
