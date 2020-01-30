@@ -81,6 +81,7 @@ public class service {
         Set<String> kStringSet = new HashSet<String>(); 
         //variabile per log
         String targetNodeId;
+        String targetNodeIdTrits;
         ArrayList<String> idObjects;
         //chiedo le keyword da inserire all'utente
         kStringSet = insertKeywords();
@@ -90,9 +91,10 @@ public class service {
 
         //visualizzo a schermo il nodo che si occupa della keyword
         targetNodeId = getStringSearched(connectedNode.generateBitSet(kStringSet), r);
-        System.out.println("\nNodo che si occupa della keyword: " + targetNodeId);
-        System.out.println("Cerco il nodo: " + targetNodeId);
-
+        targetNodeIdTrits = Arrays.toString(Trytes.fromBitsetToTrits(connectedNode.generateBitSet(kStringSet), 2));
+        System.out.println("\nRisultato dopo le keyword: " + targetNodeId);
+        System.out.println("\nNodo che se ne occupa: " + targetNodeIdTrits);
+        System.out.println("Cerco il nodo: " + targetNodeIdTrits);
         try {
             idObjects = new ArrayList<String>(connectedNode.requestObjects(kStringSet, 10));
             System.out.println(connectedNode.getObjects(hypercube, idObjects));

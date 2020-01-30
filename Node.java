@@ -1,7 +1,6 @@
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -132,7 +131,7 @@ public class Node {
     //tra tutti i vicini prendo solo quelli che soddisfano la condizione isIncluded
     public ArrayList<Node> getNeighborsIncluded(){
         ArrayList<Node> neighborsIncluded = new ArrayList<Node>();
-        for (Node neighbor : this.getNeighbors()) {
+        for (Node neighbor : this.neighborsBit) {
             if (isIncluded(this.getOne(), neighbor.getOne())) {
                 neighborsIncluded.add(neighbor);
             }
@@ -192,9 +191,6 @@ public class Node {
         return Trytes.fromBitsetToTrits(generateBitSet(keySet),2);
     }
 
-    /*private static int hashFunction(String key, int r){
-        return key.hashCode()%r;
-    }*/
 
     public Node nearestNode(byte[] targetSet){
 
@@ -219,16 +215,6 @@ public class Node {
             result = result + Math.abs((ts1[i]+1) -(ts2[i]+1));
         }
         return result;
-    }
-
-
-    private BitSet xor(BitSet bsTarget, BitSet bsNeigh){
-        BitSet bs1 = new BitSet();
-        BitSet bsXor = new BitSet();
-        bs1.or(bsTarget);
-        bsXor.or(bsNeigh);
-        bsXor.xor(bs1);
-        return bsXor;
     }
 
 
@@ -350,16 +336,16 @@ public class Node {
         } else {
             
             NodeSBT root = generateSBT(getR() - 1);
-            root.printTree(root, "  ");
+            //root.printTree(root, "  ");
             Queue<NodeSBT> queue = new LinkedList<>(root.BFS());
-            Queue<NodeSBT> queue2 = new LinkedList<>(root.BFS());
+            //Queue<NodeSBT> queue2 = new LinkedList<>(root.BFS());
 
             
             System.out.println("Cerco anche in altri nodi...");
 
-           while(!queue2.isEmpty()){
+           /*while(!queue2.isEmpty()){
                 System.out.println(queue2.remove().getId());
-            }
+            }*/
 
             while(!queue.isEmpty()){
                                 BitSet newSet = queue.remove().getBS();
