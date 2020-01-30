@@ -16,8 +16,8 @@ public class Hypercube {
         //devo creare tanti nodi quanto è grande nNode 
         for (int i = 0; i < nNode; i++){
             Node node = new Node(i,r);
-            System.out.println(i + "    " + node.getTrytes() + "     " + Arrays.toString(node.getTrits()));
-            nodes.put (node.getId(), node);
+            //System.out.println(i + "    " + node.getTrytes() + "     " + Arrays.toString(node.getTrits()));
+            nodes.put (node.getTrytes(), node);
        }
 
        for (Map.Entry<String, Node> entry : nodes.entrySet()) {
@@ -39,8 +39,8 @@ public class Hypercube {
         return nodes.keySet();
     }
     
-    public Node getNode(String idNode) {
-        return nodes.get(idNode);
+    public Node getNode(String idNodeTrytes) {
+        return nodes.get(idNodeTrytes);
     }
 
     public boolean hasNode(String idNode) {

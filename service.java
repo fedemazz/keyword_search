@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -24,17 +25,17 @@ public class service {
 
         //Simulo la connessione ad un nodo dell'ipercubo
         Node connectedNode = new Node();
-        connectedNode = hypercube.getNode(randomNode(r));
+        connectedNode = hypercube.getNode(randomNodeTrytes(r));
 
         printLog(hypercube, connectedNode);
-        //loadCsv(hypercube, connectedNode);
+        loadCsv(hypercube, connectedNode);
         String choice;
 
         do{
 
             System.out.println("\n****MENU****");
 			System.out.println("1. INSERT");
-			System.out.println("2. SUPERSET SEARCH");
+			System.out.println("2. SUPERSET SEARCH (NOT IMPLEMENTED)");
 			System.out.println("3. PIN SEARCH");
 			System.out.println("4. DELETE");
             System.out.println("5. EXIT");
@@ -48,7 +49,7 @@ public class service {
                 case "1": insert(hypercube, connectedNode);
                 break;
 
-                case "2": search(hypercube, connectedNode, r);
+                case "2": //search(hypercube, connectedNode, r);
                 break;
 
                 case "3": pinSearch(hypercube, connectedNode, r);
@@ -72,7 +73,7 @@ public class service {
 
     }
 
-    private static void search(Hypercube hypercube, Node connectedNode, int r) {
+    /*private static void search(Hypercube hypercube, Node connectedNode, int r) {
 
         System.out.print("2. SUPERSET SEARCH: ");
 
@@ -98,13 +99,14 @@ public class service {
         } catch (NullPointerException e) {
             System.out.println("Nessun oggetto trovato");
         }
-    }
+    }*/
 
     private static void pinSearch(Hypercube hypercube, Node connectedNode, int r){
         //set utilizzato per rappresentare il set di keyword
         Set<String> kStringSet = new HashSet<String>(); 
         //variabile per log
         String targetNodeId;
+        String targetNodeIdTrits;
         ArrayList<String> idObjects;
         //chiedo le keyword da inserire all'utente
         kStringSet = insertKeywords();
@@ -114,8 +116,10 @@ public class service {
 
         //visualizzo a schermo il nodo che si occupa della keyword
         targetNodeId = getStringSearched(connectedNode.generateBitSet(kStringSet), r);
-        System.out.println("\nNodo che si occupa della keyword: " + targetNodeId);
-        System.out.println("Cerco il nodo: " + targetNodeId);
+        targetNodeIdTrits = Arrays.toString(Trytes.fromBitsetToTrits(connectedNode.generateBitSet(kStringSet), 2));
+        System.out.println("\nRisultato dopo le keyword: " + targetNodeId);
+        System.out.println("\nNodo che se ne occupa: " + targetNodeIdTrits);
+        System.out.println("Cerco il nodo: " + targetNodeIdTrits);
 
         try {
             idObjects = new ArrayList<String>(connectedNode.requestObjects(kStringSet));
@@ -184,6 +188,13 @@ public class service {
             idString = "0" + idString;
         }
         return idString;
+    }
+
+    public static String randomNodeTrytes(int r){
+        String idString = Integer.toString((int)(Math.random()*(Math.pow(2,r))));
+        //String idString = Integer.toString(196);
+        String val = Trytes.fromNumber(new BigInteger(idString), 2);
+        return val;
     }
 
     private static void loadCsv(Hypercube hypercube, Node connectedNode){

@@ -228,6 +228,31 @@ public final class Trytes {
         return trits;
     }
 
+    public static int fromBitsetToInt(BitSet bitSet){
+        int bitInteger = 0;
+    for(int i = 0 ; i < 32; i++)
+        if(bitSet.get(i))
+            bitInteger |= (1 << i);
+    return bitInteger;
+    }
+
+    public static BigInteger fromBitsetToBigInt(BitSet bitSet){
+        int bitInteger = 0;
+        BigInteger bi;
+    for(int i = 0 ; i < 32; i++)
+        if(bitSet.get(i))
+            bitInteger |= (1 << i);
+    return new BigInteger(Integer.toString(bitInteger));
+    }
+
+    public static byte[] fromBitsetToTrits(BitSet bitSet, int tryteLength){
+        return Trytes.fromNumberToTrits(fromBitsetToBigInt(bitSet), tryteLength);
+    }
+
+    public static String fromBitsetToTrytes(BitSet bitSet, int tryteLength){
+        return Trytes.fromNumber(fromBitsetToBigInt(bitSet), tryteLength);
+    }
+
     private static char randomTryte() {
         return Trytes.TRYTES.charAt((int) (Math.random() * 27));
     }
@@ -282,11 +307,24 @@ public final class Trytes {
 
 
         BitSet bs = new BitSet(4);
-        bs.set(0);
         bs.set(1);
-        System.out.println(bs.toByteArray());
+        BitSet bs2 = new BitSet(4);
+        bs2.set(0);
+        bs2.set(1);
+
+
+        //System.out.println(Trytes.fromNumber(new BigInteger(Arrays.toString(bs.toByteArray())), 2));
         System.out.println(Arrays.toString(bs.toByteArray()));
+        System.out.println(Trytes.fromBitsetToInt(bs));
+        System.out.println(Arrays.toString(Trytes.fromBitsetToTrits(bs, 2)));
+        if ((Trytes.fromBitsetToTrits(bs, 2)).equals(Trytes.fromBitsetToTrits(bs2, 2))){
+        System.out.println("ciao");
+        }
 
-
+        System.out.println(Trytes.fromBitsetToTrytes(bs, 2));
+        System.out.println(Trytes.fromBitsetToTrytes(bs2, 2));
+        if (Arrays.equals(Trytes.fromBitsetToTrits(bs, 2),Trytes.fromBitsetToTrits(bs2, 2))){
+            System.out.println("ciao");
+            }
     }
 }
