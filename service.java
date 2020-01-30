@@ -184,8 +184,9 @@ public class service {
 
     public static String randomNode(int r){
     String idString = Integer.toBinaryString((int)(Math.random()*(Math.pow(2,r))));
+    String idStringTEST = Integer.toBinaryString(50);
         while (idString.length() < r){
-            idString = "0" + idString;
+            idStringTEST = "0" + idString;
         }
         return idString;
     }
